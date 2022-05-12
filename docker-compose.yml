@@ -1,5 +1,5 @@
 #
-# Copyright © 2021 Sami Ahmed (samiahmedkeys@gmail.com)
+# Copyright © 2022 Sami Ahmed (samiahmedkeys@gmail.com)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-server:7.0.3
     depends_on:
       - zookeeper
     ports:
@@ -32,8 +32,10 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "plaintext://kafka:9092"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_PASSWORD_ENCODER_SECRET: mysecret
   schema-registry:
-    image: confluentinc/cp-schema-registry:6.2.4 
+    image: confluentinc/cp-schema-registry:latest
     depends_on:
       - kafka
       - zookeeper
@@ -42,6 +44,10 @@ services:
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_RESOURCE_EXTENSION_CLASS: io.confluent.schema.exporter.SchemaExporterResourceExtension
+      SCHEMA_REGISTRY_KAFKASTORE_UPDATE_HANDLERS: io.confluent.schema.exporter.storage.SchemaExporterUpdateHandler
+      SCHEMA_REGISTRY_PASSWORD_ENCODER_SECRET: mysecret
   connect:
     build: connect
     depends_on:
