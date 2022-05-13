@@ -13,7 +13,8 @@ Refer to this repo for setting up the oracle DB and data upon which this demo is
 
 # ORACLE CDC CONNECTOR
 4. post oracle-cdc-config to connect api
-```curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
+```
+curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json" -d '{
         "name": "OracleCdcSourceConnectorSM",
         "config": {
                 "connector.class": "io.confluent.connect.oracle.cdc.OracleCdcSourceConnector",
@@ -60,8 +61,8 @@ Refer to this repo for setting up the oracle DB and data upon which this demo is
 
 # SCHEMA LINK
 1. setup SR config on CP instance, the values below should be from your CC instance
-```cat > schema-registry.config <<EOF
-
+```
+cat > schema-registry.config <<EOF
 schema.registry.url=<URL>
 basic.auth.credentials.source=USER_INFO
 basic.auth.user.info=<USER : PASSWORD>
@@ -69,7 +70,8 @@ basic.auth.user.info=<USER : PASSWORD>
 EOF
 ```
 2. create the SR exporter, provide whatever names you'd prefer in the '<>'
-```schema-exporter --create --name <> --config-file schema-registry.config \
+```
+schema-exporter --create --name <> --config-file schema-registry.config \
 --context-type CUSTOM \
 --context-name <> \
 --schema.registry.url http://schema-registry:8081
@@ -86,7 +88,8 @@ EOF
 `export CP_CLUSTER_ID="EuBiQonXQaS169R62U1MNw"``
 
 3. this is config for the cloud side, it tells cloud cluster it is destination of the link and that local cluster initiates the connection
-```cat > clusterlink-hybrid-dst.config <<EOF
+```
+cat > clusterlink-hybrid-dst.config <<EOF
 link.mode=DESTINATION
 connection.mode=INBOUND
 EOF
@@ -101,7 +104,8 @@ EOF
 `confluent kafka link create from-on-prem --config-file clusterlink-hybrid-dst.config --source-cluster-id $CP_CLUSTER_ID --source-bootstrap-server 0.0.0.0 --cluster <LKC>`
 
 5. tell CC it is source of the link & CP that it will originate connection to CC, insert your values in '<>'
-```cat > clusterlink-onprem-source.config <<EOF
+```
+cat > clusterlink-onprem-source.config <<EOF
 link.mode=SOURCE
 connection.mode=OUTBOUND bootstrap.servers=pkc-kj826.eastus2.azure.confluent.cloud:9092 security.protocol=SASL_SSL
 sasl.mechanism=PLAIN sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='<>' password='<>';
