@@ -1,7 +1,9 @@
 # CONTEXT
-Confluent demo featuring oracle CDC connector, cluster linking, and a fully managed mongoDB Atlas sink. 
+Confluent demo featuring oracle CDC connector, cluster linking, and a fully managed mongoDB Atlas sink.
 
-Refer to this repo for setting up the oracle DB and data upon which this demo is built: https://github.com/sami2ahmed/demo-database-modernization. Tl;dr we are going to launch an onprem Confluent Platform (CP) and post an Oracle CDC Source connector to run there. Oracle has our CUSTOMERS table and we will CDC off of it to onprem Confluent then replicate the data up to a Confluent Cloud (CC) cluster running in Azure via Cluster Linking. We can demonstrate changes happening on the Oracle database arrive in the CC topic instaneously. Finally our data will then be landed in Mongo Atlas for search/dashboarding, 
+Refer to this repo for setting up the oracle DB and data upon which this demo is built: https://github.com/sami2ahmed/demo-database-modernization. Tl;dr we are going to launch an onprem Confluent Platform (CP) and post an Oracle CDC Source connector to run there. Oracle has our CUSTOMERS table and we will CDC off of it to onprem Confluent then replicate the data up to a Confluent Cloud (CC) cluster running in Azure via Cluster Linking. We can demonstrate changes happening on the Oracle database arrive in the CC topic instaneously. Finally our data will then be landed in Mongo Atlas for search/dashboarding.
+
+![high level architecture](img/Hybrid cloud mongo day.jpeg)
 
 # PREREQUISITES
 1. Confluent Cloud cluster > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#set-up-confluent-cloud)
@@ -10,7 +12,7 @@ Refer to this repo for setting up the oracle DB and data upon which this demo is
 
 # CONFLUENT PLATFORM CLUSTER
 1. clone this repo, and then bring up confluent server/zookeeper, schema registry, and kafka connect via `docker-compose up -d`
-2. confirm no connectors are running 
+2. confirm no connectors are running
 `http GET "http://localhost:8083/connectors" | jq '.'\`
 3. view existing topics and create redo-log-topic
 `kafka-topics --bootstrap-server localhost:9092 --list`
