@@ -1,7 +1,6 @@
 Database modernization demo featuring oracle CDC connector, cluster linking, ksqldb, and a fully managed mongoDB Atlas sink
 
-Refer to this repo for setting up the oracle DB and data upon which this demo is built: https://github.com/sami2ahmed/demo-database-modernization. Tl;dr we are going to launch an onprem Confluent Platform and post an Oracle CDC Source connector to run there. It's going to house our CUSTOMERS table. Sensitive data will be masked by a
-
+Refer to this repo for setting up the oracle DB and data upon which this demo is built: https://github.com/sami2ahmed/demo-database-modernization. Tl;dr we are going to launch an onprem Confluent Platform and post an Oracle CDC Source connector to run there. It's going to house our CUSTOMERS table. 
 
 # CONFLUENT PLATFORM CLUSTER
 1. from root of repo 
@@ -47,7 +46,8 @@ Refer to this repo for setting up the oracle DB and data upon which this demo is
                 "confluent.topic.bootstrap.servers":"kafka:9092",
                 "topic.creation.enable": true
                 }
-        }'```
+        }'
+```
 5. confirm connector is up
 `http GET "http://localhost:8083/connectors" | jq '.'`
 6. confirm topic is created and populated by connector, you'll need to insert your username from oracle DB in the command below.  
@@ -60,23 +60,23 @@ Refer to this repo for setting up the oracle DB and data upon which this demo is
 
 # SCHEMA LINK
 1. setup SR config on CP instance, the values below should be from your CC instance
-`cat > schema-registry.config <<EOF
+```cat > schema-registry.config <<EOF
 
 schema.registry.url=<URL>
 basic.auth.credentials.source=USER_INFO
 basic.auth.user.info=<USER : PASSWORD>
 
-EOF`
-
-2. create the SR exporter, provide whatever names in <>
-schema-exporter --create --name <> --config-file schema-registry.config \
+EOF
+```
+2. create the SR exporter, provide whatever names you'd prefer in the '<>'
+```schema-exporter --create --name <> --config-file schema-registry.config \
 --context-type CUSTOM \
 --context-name <> \
 --schema.registry.url http://schema-registry:8081
+```
 
-3. check status of exporter
-schema-exporter --describe --name <> --schema.registry.url http://schema-registry:8081 | jq
-
+3. check status of exporter, insert your schema exporter name from #2 in the '<>'
+`schema-exporter --describe --name <> --schema.registry.url http://schema-registry:8081 | jq`
 
 # CLUSTER LINK
 1. get onprem cluster id -- THIS CHANGES EACH TIME YOU DOCKER UP AND DOWN
@@ -86,29 +86,30 @@ schema-exporter --describe --name <> --schema.registry.url http://schema-registr
 `export CP_CLUSTER_ID="EuBiQonXQaS169R62U1MNw"``
 
 3. this is config for the cloud side, it tells cloud cluster it is destination of the link and that local cluster initiates the connection
-`cat > clusterlink-hybrid-dst.config <<EOF
+```cat > clusterlink-hybrid-dst.config <<EOF
 link.mode=DESTINATION
 connection.mode=INBOUND
-EOF`
+EOF
+```
 
 *you must login to confluent cloud CLI and select cluster there before proceeding with 4 i.e.
 `cflt login`
 `cflt environment use <ENV>`
 `cflt kafka cluster use <LKC>`
 
-4. cluster link creation on CC side, insert your lkc including "lkc" in <>
+4. cluster link creation on CC side, insert your lkc including "lkc" in the '<>'
 `confluent kafka link create from-on-prem --config-file clusterlink-hybrid-dst.config --source-cluster-id $CP_CLUSTER_ID --source-bootstrap-server 0.0.0.0 --cluster <LKC>`
 
 5. tell CC it is source of the link & CP that it will originate connection to CC, insert your values in '<>'
-`cat > clusterlink-onprem-source.config <<EOF
+```cat > clusterlink-onprem-source.config <<EOF
 link.mode=SOURCE
 connection.mode=OUTBOUND bootstrap.servers=pkc-kj826.eastus2.azure.confluent.cloud:9092 security.protocol=SASL_SSL
 sasl.mechanism=PLAIN sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='<>' password='<>';
-EOF`
+EOF
+```
 
 6. create link from CP side, insert your lkc like in step above
 `kafka-cluster-links --bootstrap-server kafka:9092 --create --link from-on-prem --config-file clusterlink-onprem-source.config --cluster-id <LKC>`
-
 
 # PYTHON PRODUCER
 WIP
