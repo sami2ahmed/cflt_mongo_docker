@@ -1,1 +1,5 @@
 .DS_Store
+oracle-cdc-connect.config
+clusterlink-onprem-source.config
+schema-registry.config
+client_ssl.properties.config
