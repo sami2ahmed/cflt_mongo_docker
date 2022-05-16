@@ -7,8 +7,8 @@ Refer to this repo for setting up the oracle DB and data upon which this demo is
 
 # PREREQUISITES
 1. Confluent Cloud cluster > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#set-up-confluent-cloud)
-2. Confluent Platform > [LINK](https://docs.confluent.io/platform/current/installation/installing_cp/zip-tar.html#manual-install-using-zip-and-tar-archives)
-3. Oracle (I used AWS RDS) > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#create-an-oracle-db-instance)
+2. Docker
+3. Oracle 19c database (I used AWS RDS) > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#create-an-oracle-db-instance)
 
 # CONFLUENT PLATFORM CLUSTER
 1. clone this repo, and then bring up confluent server/zookeeper, schema registry, and kafka connect via `docker-compose up -d`
