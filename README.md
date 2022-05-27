@@ -1,12 +1,12 @@
 # CONTEXT
 Confluent demo featuring oracle CDC connector, cluster linking, and a fully managed mongoDB Atlas sink.
 
-Refer to this repo for setting up the oracle DB and data upon which this demo is built: https://github.com/sami2ahmed/demo-database-modernization. Tl;dr we are going to launch an onprem Confluent Platform (CP) and post an Oracle CDC Source connector to run there. Oracle has our CUSTOMERS table and we will CDC off of it to onprem Confluent then replicate the data up to a Confluent Cloud (CC) cluster running in Azure via Cluster Linking. We can demonstrate changes happening on the Oracle database arrive in the CC topic instaneously. Finally our data will then be landed in Mongo Atlas for search/dashboarding.
+Refer to this repo for setting up the oracle DB and data upon which this demo is built: https://github.com/sami2ahmed/demo-database-modernization. Tl;dr we are going to launch an onprem Confluent Platform (CP) and post an Oracle CDC Source connector to run there. Oracle has our CUSTOMERS table and we will CDC off of it to onprem Confluent then replicate the data up to a Confluent Cloud (CC) cluster running in Azure via Cluster Linking. We can demonstrate changes happening on the Oracle database arrive in the CC topic instantaneously. Finally our data will then be landed in Mongo Atlas for search/dashboarding.
 
 ![high level architecture](img/Hybrid-cloud-mongo-day.jpeg)
 
 # PREREQUISITES
-1. Confluent Cloud cluster > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#set-up-confluent-cloud)
+1. Dedicated Confluent Cloud cluster > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#set-up-confluent-cloud)
 2. Docker
 3. Oracle 19c database (I used AWS RDS) > [LINK](https://github.com/confluentinc/demo-database-modernization/blob/master/setup.md#create-an-oracle-db-instance)
 
@@ -42,6 +42,11 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
                 "redo.log.row.fetch.size": 1,
                 "numeric.mapping": "best_fit_or_double",
 
+                "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+                "value.converter.schemas.enable": "false",
+                "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+                "key.converter.schemas.enable": "false",
+
                 "topic.creation.groups":"redo",
                 "topic.creation.redo.include":"redo-log-topic",
                 "topic.creation.redo.replication.factor":1,
@@ -62,7 +67,7 @@ curl -X POST http://localhost:8083/connectors -H "Content-Type: application/json
 `kafka-console-consumer --bootstrap-server localhost:9092 --topic ORCL.ADMIN2.CUSTOMERS --from-beginning`
 7. in differnet terminal you can run an update against the connector and confirm its being captured, i ran AWS RDS oracle and ssh'ed into it, then login as admin (user you setup with the appropriate connect privileges as described in demo-mod repo).
 `update CUSTOMERS set avg_credit_spend = avg_credit_spend+300 where first_name = 'Hansiain';`
-`COMMIT WORK;`
+`COMMIT;`
 8. you can start a different terminal and kafka consumer to ensure changes like the update above come into the redo-log-topic
 `kafka-console-consumer --bootstrap-server localhost:9092 --topic redo-log-topic --from-beginning`
 
@@ -92,7 +97,7 @@ schema-exporter --create --name <> --config-file schema-registry.config \
 `kafka-cluster cluster-id --bootstrap-server kafka:9092`
 
 2. export cluster id as variable, insert in <> below.
-`export CP_CLUSTER_ID="EuBiQonXQaS169R62U1MNw"``
+`export CP_CLUSTER_ID="<>"`
 
 3. this is config for the cloud side, it tells cloud cluster it is destination of the link and that local cluster initiates the connection
 ```
