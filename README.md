@@ -137,8 +137,8 @@ EOF
 `kafka-cluster-links --bootstrap-server kafka:9092 --create --link from-on-prem --config-file clusterlink-onprem-source.config --cluster-id <LKC>`
 
 7. Mirror specific topics
-cflt kafka mirror create ORACLE.SAMIADMIN.CUSTOMERS --link from-on-prem
-cflt kafka mirror create redo-log-topic --link from-on-prem
+`cflt kafka mirror create ORACLE.SAMIADMIN.CUSTOMERS --link from-on-prem`
+`cflt kafka mirror create redo-log-topic --link from-on-prem`
 
 # TEARDOWN
 (for the cp side, simply docker-compose down) 
