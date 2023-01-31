@@ -20,7 +20,7 @@ resource "confluent_environment" "staging" {
 # but you should to place both in the same cloud and region to restrict the fault isolation boundary.
 data "confluent_schema_registry_region" "essentials" {
   cloud   = "AWS"
-  region  = "us-west-2"
+  region  = "us-east-2"
   package = "ESSENTIALS"
 }
 

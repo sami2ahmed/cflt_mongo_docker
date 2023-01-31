@@ -104,8 +104,8 @@ resource "aws_db_subnet_group" "rds_public_subnet_group" {
   ]
 }
 
-resource "aws_db_instance" "sami-oracle-rds" {
-  identifier             = "sami-oracle-rds"
+resource "aws_db_instance" "sami-oracle-rds-gko" {
+  identifier             = "sami-oracle-rds-gko"
   instance_class         = "db.t3.small" # tasty not wasty small instance as this is not for heavy workload  
   engine                 = "oracle-ee"
   engine_version         = "19"
